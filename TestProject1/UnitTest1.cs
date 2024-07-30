@@ -31,7 +31,7 @@ namespace TestProject1
 
                 // Tìm ô nhập tên đăng nhập và mật khẩu
                 var usernameField = wait.Until(d => d.FindElement(By.Name("username")));
-                usernameField.SendKeys("thuongdev@gmail.com");
+                usernameField.SendKeys("cuong.0907062600@gmail.com");
 
                 var passwordField = driver.FindElement(By.Id("password-field-register"));
                 passwordField.SendKeys("Thuong12345");

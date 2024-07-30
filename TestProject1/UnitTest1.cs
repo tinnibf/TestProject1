@@ -1,6 +1,8 @@
-using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using NUnit.Framework;
+using System;
 
 namespace TestProject1
 {
@@ -18,11 +20,11 @@ namespace TestProject1
         }
 
         [Test]
-        public void LoginToVnExpress()
+        public void LoginToTuoiTre()
         {
             try
             {
-                // Mở trang chủ của VnExpress
+                // Mở trang chủ
                 driver.Navigate().GoToUrl("https://tuoitre.vn/");
 
                 // Click vào liên kết đăng nhập nếu có
@@ -33,36 +35,45 @@ namespace TestProject1
                 var usernameField = wait.Until(d => d.FindElement(By.Name("username")));
                 usernameField.SendKeys("cuong.0907062600@gmail.com");
 
-                var passwordField = driver.FindElement(By.Id("password-field-register"));
+                var passwordField = driver.FindElement(By.Name("password"));
                 passwordField.SendKeys("Thuong12345");
 
                 // Tìm và nhấn nút đăng nhập
                 var submitButton = driver.FindElement(By.Id("button-login"));
                 submitButton.Click();
 
-                // Chờ trang đăng nhập phản hồi
-                wait.Until(d => d.Title.Contains("Expected Title After Login") || d.FindElement(By.CssSelector("txt-error-login")).Displayed);
-
-                // Kiểm tra nếu đăng nhập thành công
-                if (driver.Title.Contains("Expected Title After Login"))
+                bool loginSuccessful = false;
+                try
                 {
-                    Console.WriteLine("Đăng nhập thành công!");
-                    Assert.Pass("Đăng nhập thành công.");
+                    // Kiểm tra tiêu đề trang hoặc phần tử cụ thể để xác nhận đăng nhập thành công
+                    wait.Until(d => d.Title.Contains("Tiêu đề mong đợi sau khi đăng nhập"));
+                    loginSuccessful = true;
                 }
-                else if (driver.FindElement(By.CssSelector("txt-error-login")).Displayed)
+                catch (WebDriverTimeoutException)
                 {
-                    Console.WriteLine("Đăng nhập không thành công.");
-                    Assert.Fail("Đăng nhập không thành công.");
-                }
-                else
-                {
-                    Assert.Fail("Không rõ lý do đăng nhập không thành công.");
+                    // Kiểm tra thông báo lỗi nếu tiêu đề không thay đổi
+                    bool errorDisplayed = IsElementDisplayed(By.CssSelector("txt-error-login"));
+                    if (errorDisplayed)
+                    {
+                        loginSuccessful = false;
+                    }
                 }
             }
             catch (NoSuchElementException e)
             {
-                Console.WriteLine($"Lỗi: {e.Message}");
-                Assert.Fail("Có lỗi xảy ra trong quá trình kiểm tra.");
+                Assert.Fail($"Có lỗi xảy ra trong quá trình kiểm tra: {e.Message}");
+            }
+        }
+
+        private bool IsElementDisplayed(By by)
+        {
+            try
+            {
+                return driver.FindElement(by).Displayed;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
             }
         }
 

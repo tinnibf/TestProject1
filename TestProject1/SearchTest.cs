@@ -26,18 +26,23 @@ namespace TestProject1
             {
                 driver.Navigate().GoToUrl("https://tuoitre.vn/");
 
+                // Wait until the search form button is present and clickable
                 var searchButton = WaitForElementToBeInteractable(driver, By.ClassName("frm-search"), TimeSpan.FromSeconds(10));
                 searchButton.Click();
 
-                string keyword = "thủ tướng";
+                // Define the keyword
+                string keyword = "Thủ tướng Phạm Minh Chính lên đường thăm Ấn Độ";
 
+                // Locate and interact with the search input field
                 var searchBox = WaitForElementToBeInteractable(driver, By.ClassName("input-search"), TimeSpan.FromSeconds(10));
                 searchBox.Click();
                 searchBox.SendKeys(keyword);
                 searchBox.SendKeys(Keys.Enter);
 
+                // Wait for the search results to load
                 WaitForElementToBeInteractable(driver, By.ClassName("total-search"), TimeSpan.FromSeconds(10));
 
+                // Verify that the search results page is loaded
                 string expectedUrl = "https://tuoitre.vn/tim-kiem.htm" + Uri.EscapeDataString(keyword);
                 string currentUrl = expectedUrl;
                 if (!currentUrl.Equals(expectedUrl, StringComparison.OrdinalIgnoreCase))
@@ -45,7 +50,10 @@ namespace TestProject1
                     throw new Exception($"Search results page did not load as expected. Actual URL: {currentUrl}");
                 }
 
+                // Verify that the search results contain the keyword
                 var searchResults = driver.FindElements(By.ClassName("box-category-link-title"));
+
+                // Print search results for debugging
                 Console.WriteLine("Search results:");
                 foreach (var result in searchResults)
                 {
@@ -90,7 +98,7 @@ namespace TestProject1
                     // Ignore exceptions and retry until timeout
                 }
 
-                Thread.Sleep(500); 
+                Thread.Sleep(500); // Wait for 500ms before retrying
             }
 
             throw new NoSuchElementException($"Element not found or not interactable: {by.ToString()}");
@@ -106,7 +114,7 @@ namespace TestProject1
                 {
                     return;
                 }
-                Thread.Sleep(500); 
+                Thread.Sleep(500); // Wait for 500ms before checking again
             }
 
             throw new TimeoutException("Page did not load within the timeout period.");
@@ -114,6 +122,7 @@ namespace TestProject1
         [TearDown]
         public void TearDown()
         {
+            // Đóng trình duyệt sau khi hoàn thành test
             driver.Quit();
         }
 
